@@ -23,7 +23,7 @@ Zero runtime dependencies. Library + `opf` CLI. MIT.
 ## Install
 
 ```bash
-npm install @cairnsecurity/opf-tools
+npm install @cairnsec/opf-tools
 ```
 
 ## CLI
@@ -44,7 +44,7 @@ Reads a file argument or stdin; writes a file argument or stdout.
 ## Library
 
 ```ts
-import { opfToSarif, opfToDefectDojo, sarifToOpf, validateOpf } from '@cairnsecurity/opf-tools'
+import { opfToSarif, opfToDefectDojo, sarifToOpf, validateOpf } from '@cairnsec/opf-tools'
 
 const sarif = opfToSarif(opfDocument)
 const dd = opfToDefectDojo(opfDocument)
