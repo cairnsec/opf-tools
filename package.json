@@ -1,5 +1,5 @@
 {
-  "name": "@cairnsec/opf-tools",
+  "name": "@cairnsecurity/opf-tools",
   "version": "0.1.0",
   "description": "Converters between the Open Pentest Format (OPF) and SARIF, DefectDojo, GitLab, Markdown, HTML and CSV.",
   "type": "module",
