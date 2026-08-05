@@ -1,0 +1,45 @@
+{
+  "name": "@cairnsec/opf-tools",
+  "version": "0.1.0",
+  "description": "Converters between the Open Pentest Format (OPF) and SARIF, DefectDojo, GitLab, Markdown, HTML and CSV.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Cairn Security",
+  "keywords": [
+    "opf",
+    "open-pentest-format",
+    "sarif",
+    "defectdojo",
+    "gitlab",
+    "pentest",
+    "security",
+    "converter",
+    "vulnerability"
+  ],
+  "homepage": "https://cairnsecurity.com/opf",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cairnsec/opf-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cairnsec/opf-tools/issues"
+  },
+  "bin": { "opf": "dist/cli.js" },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": { ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" } },
+  "files": ["dist", "README.md", "LICENSE"],
+  "sideEffects": false,
+  "publishConfig": { "access": "public" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "engines": { "node": ">=18" },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.3.0"
+  }
+}

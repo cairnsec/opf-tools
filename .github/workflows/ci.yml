@@ -1,0 +1,70 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - run: npm install
+
+      - name: Typecheck and build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      - name: CLI smoke test
+        run: |
+          cat > /tmp/lib.opf.json <<'JSON'
+          {
+            "opfVersion": "1.1",
+            "findings": [
+              {
+                "title": "SQL injection in the report search endpoint",
+                "severity": "critical",
+                "cvssVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+                "cweIds": ["CWE-89"]
+              }
+            ]
+          }
+          JSON
+          node dist/cli.js validate /tmp/lib.opf.json
+          for c in sarif markdown html csv defectdojo gitlab; do
+            node dist/cli.js "$c" /tmp/lib.opf.json > /dev/null || exit 1
+          done
+          node dist/cli.js csv   /tmp/lib.opf.json | node dist/cli.js from-csv   | node dist/cli.js validate
+          node dist/cli.js sarif /tmp/lib.opf.json | node dist/cli.js from-sarif | node dist/cli.js validate
+
+  package:
+    name: package contents
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install
+      - run: npm run build
+
+      - name: Pack and list what would ship
+        run: npm pack --dry-run
