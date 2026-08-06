@@ -1,6 +1,6 @@
 {
   "name": "@cairnsec/opf-tools",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Converters between the Open Pentest Format (OPF) and SARIF, DefectDojo, GitLab, Markdown, HTML and CSV.",
   "type": "module",
   "license": "MIT",

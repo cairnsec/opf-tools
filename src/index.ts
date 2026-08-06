@@ -17,4 +17,4 @@ export {
 export { opfToGitLab, type GitLabReport, type OpfToGitLabOptions } from './gitlab.js'
 export { validateOpf, type ValidationResult, type ValidationIssue } from './validate.js'
 
-export const VERSION = '0.1.0'
+export { TOOLS_VERSION as VERSION } from './core.js'

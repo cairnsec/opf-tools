@@ -14,8 +14,7 @@ import {
   assertOpf,
   coerceSeverity,
   htmlToText,
-  makeUniqueId,
-} from './core.js'
+  makeUniqueId, TOOLS_VERSION } from './core.js'
 
 const SEVERITY_TO_GL: Record<OpfSeverity, string> = {
   critical: 'Critical',
@@ -91,8 +90,8 @@ export function opfToGitLab(doc: OpfDocument, options: OpfToGitLabOptions = {}):
       status: 'success',
       start_time: ts,
       end_time: ts,
-      analyzer: { id: 'opf-tools', name: 'OPF Tools', version: '0.1.0', vendor: { name: 'Cairn Security' } },
-      scanner: { id: 'opf-tools', name: 'OPF Tools', version: '0.1.0', vendor: { name: 'Cairn Security' } },
+      analyzer: { id: 'opf-tools', name: 'OPF Tools', version: TOOLS_VERSION, vendor: { name: 'Cairn Security' } },
+      scanner: { id: 'opf-tools', name: 'OPF Tools', version: TOOLS_VERSION, vendor: { name: 'Cairn Security' } },
     },
     vulnerabilities,
   }
