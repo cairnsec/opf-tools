@@ -64,6 +64,8 @@ opf github-push library.opf.json
 
 Every finding maps to a neutral `IssueDraft`; each tracker is a thin adapter over it. All push commands print a JSON preview (`*-rest`) so you can review what will be created before sending it.
 
+> New in 0.2.0: the REST/GraphQL push adapters are built against each API's documented contract and unit-tested with mocked transports, but not yet exercised against live instances. Preview with the `*-rest` command and start on a scratch project. Please report any real-world payload mismatches.
+
 | Tracker | CSV import | REST push | Push env vars |
 |---------|:----------:|:---------:|---------------|
 | Jira | `jira-csv` | `jira-push` | `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_TOKEN`, `JIRA_PROJECT` |
