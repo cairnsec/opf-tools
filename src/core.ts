@@ -76,7 +76,7 @@ export const OPF_VERSION = '1.1'
  * This package's own version, as emitted into formats that record which tool
  * produced the report. Kept in step with package.json by a test.
  */
-export const TOOLS_VERSION = '0.1.2'
+export const TOOLS_VERSION = '0.2.0'
 
 /** Assert (loosely) that a value is an OPF document; throw otherwise. */
 export function assertOpf(doc: unknown): asserts doc is OpfDocument {
@@ -136,6 +136,30 @@ export function escapeHtml(input: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;')
+}
+
+/**
+ * Neutralise a CSV cell against spreadsheet formula injection (CWE-1236). A
+ * value whose first character is a formula trigger (`= + - @`) or a control
+ * character (TAB, CR) is prefixed with a single quote so Excel/Sheets treat it
+ * as text rather than evaluating it.
+ *
+ * A value that already begins with a quote is prefixed too, so the transform
+ * stays injective and `unguardCsvCell` can reverse it exactly: without this,
+ * `'=x` and `=x` would both serialise to `'=x` and the apostrophe would be lost
+ * on read.
+ */
+export function guardCsvCell(value: string): string {
+  return /^['=+\-@\t\r]/.test(value) ? `'${value}` : value
+}
+
+/**
+ * Reverse `guardCsvCell`: strip exactly one leading quote. This also correctly
+ * unwraps a cell an Excel user text-guarded with a leading apostrophe, matching
+ * spreadsheet convention.
+ */
+export function unguardCsvCell(value: string): string {
+  return value.startsWith("'") ? value.slice(1) : value
 }
 
 export function slugify(input: string): string {

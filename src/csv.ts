@@ -8,8 +8,10 @@ import {
   allCwes,
   assertOpf,
   coerceSeverity,
+  guardCsvCell,
   htmlToText,
   newOpfDocument,
+  unguardCsvCell,
 } from './core.js'
 
 const COLUMNS = [
@@ -31,8 +33,9 @@ const COLUMNS = [
 ] as const
 
 function csvEscape(value: string): string {
-  if (/[",\r\n]/.test(value)) return `"${value.replace(/"/g, '""')}"`
-  return value
+  const v = guardCsvCell(value)
+  if (/[",\r\n]/.test(v)) return `"${v.replace(/"/g, '""')}"`
+  return v
 }
 
 function cell(f: OpfFinding, col: (typeof COLUMNS)[number]): string {
@@ -136,7 +139,7 @@ export function csvToOpf(text: string, source = 'CSV'): OpfDocument {
   const idx = (name: string) => header.indexOf(name.toLowerCase())
   const col = (r: string[], name: string) => {
     const i = idx(name)
-    return i >= 0 ? (r[i] ?? '').trim() : ''
+    return i >= 0 ? unguardCsvCell((r[i] ?? '').trim()) : ''
   }
 
   const doc = newOpfDocument(source)
