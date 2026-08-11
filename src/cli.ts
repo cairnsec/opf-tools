@@ -26,6 +26,8 @@ import {
   opfToCsv,
   csvToOpf,
   opfToDefectDojo,
+  defectDojoToOpf,
+  fetchDefectDojoOpf,
   opfToGitLab,
   opfToIssuesCsv,
   opfToJiraRest,
@@ -55,6 +57,8 @@ const COMMANDS = new Set([
   'from-csv',
   'defectdojo',
   'dd',
+  'from-defectdojo',
+  'defectdojo-pull',
   'gitlab',
   'jira-csv',
   'github-csv',
@@ -110,6 +114,10 @@ function usage(code: number): never {
       '  csv          OPF  -> CSV',
       '  from-csv     CSV  -> OPF',
       '  defectdojo   OPF  -> DefectDojo Generic Findings Import  (alias: dd)',
+      '  from-defectdojo  DefectDojo findings JSON -> OPF',
+      '  defectdojo-pull  Pull findings from a live DefectDojo -> OPF',
+      '                   (env: DEFECTDOJO_URL, DEFECTDOJO_TOKEN,',
+      '                    optional DEFECTDOJO_PRODUCT/_ENGAGEMENT/_TEST)',
       '  gitlab       OPF  -> GitLab SAST report',
       '  jira-csv     OPF  -> Jira-importable CSV',
       '  github-csv   OPF  -> GitHub Issues CSV',
@@ -199,6 +207,24 @@ async function run(command: string, inputPath?: string, outputPath?: string): Pr
     case 'dd':
       output = stringify(opfToDefectDojo(json() as never))
       break
+    case 'from-defectdojo':
+      output = stringify(defectDojoToOpf(json()))
+      break
+    case 'defectdojo-pull': {
+      const filters = {
+        product: process.env.DEFECTDOJO_PRODUCT,
+        engagement: process.env.DEFECTDOJO_ENGAGEMENT,
+        test: process.env.DEFECTDOJO_TEST,
+      }
+      output = stringify(
+        await fetchDefectDojoOpf({
+          baseUrl: requireEnv('DEFECTDOJO_URL'),
+          apiToken: requireEnv('DEFECTDOJO_TOKEN'),
+          filters,
+        }),
+      )
+      break
+    }
     case 'gitlab':
       output = stringify(opfToGitLab(json() as never))
       break

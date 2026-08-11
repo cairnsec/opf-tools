@@ -76,7 +76,7 @@ export const OPF_VERSION = '1.1'
  * This package's own version, as emitted into formats that record which tool
  * produced the report. Kept in step with package.json by a test.
  */
-export const TOOLS_VERSION = '0.2.0'
+export const TOOLS_VERSION = '0.2.1'
 
 /** Assert (loosely) that a value is an OPF document; throw otherwise. */
 export function assertOpf(doc: unknown): asserts doc is OpfDocument {

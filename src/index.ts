@@ -11,8 +11,13 @@ export { opfToHtml, type OpfToHtmlOptions } from './html.js'
 export { opfToCsv, csvToOpf, parseCsv } from './csv.js'
 export {
   opfToDefectDojo,
+  defectDojoToOpf,
+  fetchDefectDojoOpf,
   type DefectDojoImport,
   type DefectDojoFinding,
+  type DefectDojoApiFinding,
+  type DdToOpfOptions,
+  type FetchDefectDojoOptions,
 } from './defectdojo.js'
 export { opfToGitLab, type GitLabReport, type OpfToGitLabOptions } from './gitlab.js'
 export {

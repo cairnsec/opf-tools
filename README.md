@@ -2,7 +2,7 @@
 
 Converters between the [Open Pentest Format](https://github.com/cairnsec/opf) (OPF) and the formats security teams already use.
 
-OPF is a small, portable JSON format for pentest findings and finding libraries. On its own a portable format is only half the story, it has to reach the tools people actually run. `opf-tools` is that bridge: it turns an OPF library into SARIF, DefectDojo, GitLab, Jira, issue-tracker CSV, Markdown, HTML or CSV, and reads SARIF and CSV back into OPF.
+OPF is a small, portable JSON format for pentest findings and finding libraries. On its own a portable format is only half the story, it has to reach the tools people actually run. `opf-tools` is that bridge: it turns an OPF library into SARIF, DefectDojo, GitLab, Jira, issue-tracker CSV, Markdown, HTML or CSV, and reads SARIF, CSV and DefectDojo findings back into OPF.
 
 Zero runtime dependencies. Library + `opf` CLI. MIT.
 
@@ -13,6 +13,8 @@ Zero runtime dependencies. Library + `opf` CLI. MIT.
 | `sarif` | OPF → SARIF 2.1.0 | GitHub code scanning, Azure DevOps, VS Code SARIF Viewer |
 | `from-sarif` | SARIF → OPF | Bring scanner output into an OPF library |
 | `defectdojo` | OPF → DefectDojo Generic Findings Import | Import a library into DefectDojo, no custom parser |
+| `from-defectdojo` | DefectDojo findings JSON → OPF | Turn a saved DefectDojo export into OPF |
+| `defectdojo-pull` | live DefectDojo → OPF | Pull findings from the DefectDojo API into OPF |
 | `gitlab` | OPF → GitLab SAST report | Surface findings on GitLab MRs / security dashboard |
 | `jira-csv` | OPF → Jira-importable CSV | Bulk-create issues via Jira's CSV import wizard |
 | `jira-rest` | OPF → Jira bulk-create JSON | Review the `/issue/bulk` payload before sending it |
@@ -51,6 +53,10 @@ opf markdown library.opf.json > FINDINGS.md
 opf validate library.opf.json                                  # non-zero exit if invalid
 cat scan.sarif.json | opf from-sarif > scan.opf.json           # scanner → OPF
 
+# pull findings out of a live DefectDojo (every scanner it aggregates becomes OPF)
+export DEFECTDOJO_URL=https://dojo.example.com DEFECTDOJO_TOKEN=...
+opf defectdojo-pull > library.opf.json
+
 # create issues in a live Jira instance
 export JIRA_BASE_URL=https://acme.atlassian.net JIRA_EMAIL=you@acme.com JIRA_TOKEN=... JIRA_PROJECT=SEC
 opf jira-push library.opf.json
@@ -86,6 +92,8 @@ Reads a file argument or stdin; writes a file argument or stdout.
 import {
   opfToSarif,
   opfToDefectDojo,
+  defectDojoToOpf,
+  fetchDefectDojoOpf,
   opfToIssues,
   opfToIssuesCsv,
   opfToJiraRest,
@@ -103,6 +111,10 @@ const sarif = opfToSarif(opfDocument)
 const dd = opfToDefectDojo(opfDocument)
 const opf = sarifToOpf(sarifLog)
 const { valid, errors } = validateOpf(opfDocument)
+
+// DefectDojo, both directions
+const fromExport = defectDojoToOpf(defectDojoFindingsJson)     // a saved export → OPF
+const fromApi = await fetchDefectDojoOpf({ baseUrl, apiToken, filters: { engagement: 7 } })
 
 // issue trackers
 const drafts = opfToIssues(opfDocument)                        // tracker-neutral tickets
@@ -125,6 +137,7 @@ Every `push*` takes an injectable `fetch` for testing, and each has a pure count
 - **Identifiers travel.** CWE, CVE, OWASP and MITRE ATT&CK map to each format's native identifier or tag (`external/cwe/cwe-89` for SARIF, integer `cwe` for DefectDojo, typed `identifiers[]` for GitLab).
 - **Text is normalised.** OPF text is often HTML (`textFormat: "html"`); it is stripped to plain text for text fields and lightly formatted for Markdown/HTML.
 - **Round trips keep structure.** OPF → CSV → OPF and OPF → SARIF → OPF preserve the fields those formats can represent, so a finding survives as a finding, not a flattened paragraph.
+- **DefectDojo works both ways.** `opfToDefectDojo` imports a library in; `defectDojoToOpf` / `fetchDefectDojoOpf` read findings back out (the REST-API finding shape, not the generic-import shape), so everything DefectDojo aggregates becomes reachable as OPF. The read direction defaults to active, non-false-positive, non-duplicate findings. A few DefectDojo fields have no clean OPF home and are handled best-effort: flat `tags` are split into `owaspCategory`/`mitreTechniques` with the rest under `customFields.tags`, and `endpoints` (returned as ids by the API) are carried through only when already URL-like.
 - **One issue model, many trackers.** Each finding maps once to a neutral `IssueDraft` (summary, priority, labels, a Markdown body, and structured CVSS/CWE/CVE fields). Severity becomes each tracker's priority scale, and every tracker is then a thin adapter over that draft: a CSV column profile (Jira, GitHub, Linear, Azure Boards, generic) or a REST/GraphQL payload builder plus a live pusher (Jira, GitHub, GitLab, Linear, Azure Boards, ServiceNow). Adding another API-backed tracker is a small file modelled on the existing adapters.
 
 ## Why
