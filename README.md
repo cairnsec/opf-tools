@@ -6,13 +6,15 @@ OPF is a small, portable JSON format for pentest findings and finding libraries.
 
 Zero runtime dependencies. Library + `opf` CLI. MIT.
 
+> **DefectDojo imports OPF natively as of [3.3.0](https://github.com/DefectDojo/django-DefectDojo/releases/tag/3.3.0).** Point it at your `.opf.json` directly (scan type "OPF Scan"), no converter needed. The `defectdojo` command below is for older DefectDojo, or the generic-import path. [Details.](https://cairnsecurity.com/blog/defectdojo-native-opf-import)
+
 ## Converters
 
 | Command | From → To | Use it for |
 |---------|-----------|------------|
 | `sarif` | OPF → SARIF 2.1.0 | GitHub code scanning, Azure DevOps, VS Code SARIF Viewer |
 | `from-sarif` | SARIF → OPF | Bring scanner output into an OPF library |
-| `defectdojo` | OPF → DefectDojo Generic Findings Import | Import a library into DefectDojo, no custom parser |
+| `defectdojo` | OPF → DefectDojo Generic Findings Import | Generic import for DefectDojo < 3.3.0 (3.3.0+ reads OPF natively) |
 | `from-defectdojo` | DefectDojo findings JSON → OPF | Turn a saved DefectDojo export into OPF |
 | `defectdojo-pull` | live DefectDojo → OPF | Pull findings from the DefectDojo API into OPF |
 | `gitlab` | OPF → GitLab SAST report | Surface findings on GitLab MRs / security dashboard |
